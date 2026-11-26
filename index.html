@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BLAZEPOD">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>BLAZEPOD カートトレーニング</title>
+<style>
+:root{
+  --bg:#0f1216; --bg2:#171c22; --card:#1d242c; --line:#2c3642;
+  --fg:#eef2f6; --mute:#9aa7b4;
+  --red:#e2483c; --blue:#2f7fe0; --green:#28a76a; --yellow:#e8b43a;
+  --accent:#e2483c;
+  --radius:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:16px; line-height:1.65; padding-bottom:84px;
+  -webkit-text-size-adjust:100%;
+}
+header{
+  position:sticky; top:0; z-index:30; background:rgba(15,18,22,.92);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  padding:env(safe-area-inset-top) 0 0;
+}
+.hd{display:flex; align-items:center; gap:10px; padding:12px 16px}
+.hd .dot{width:11px;height:11px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
+.hd h1{font-size:16px;margin:0;letter-spacing:.02em}
+.hd .sub{font-size:11px;color:var(--mute);margin-left:auto}
+main{padding:16px 14px 0; max-width:720px; margin:0 auto}
+h2{font-size:19px;margin:26px 0 10px;letter-spacing:.01em}
+h2:first-child{margin-top:4px}
+h3{font-size:15px;margin:18px 0 8px;color:var(--fg)}
+p{margin:8px 0}
+.lead{color:var(--mute); font-size:13.5px; margin:0 0 14px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin:12px 0}
+.card.flat{background:var(--bg2)}
+.pill{display:inline-block; font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); color:var(--mute); background:#0c1014}
+.pill.reaction{color:#ffb3ad;border-color:#53241f;background:#2a1513}
+.pill.vision{color:#aacdfa;border-color:#1f3c5e;background:#111e2c}
+.pill.decision{color:#bdeccf;border-color:#1f4d35;background:#10241a}
+.pill.warmup{color:#f3dba4;border-color:#5a4718;background:#241d0d}
+.pill.game{color:#e3cdfa;border-color:#453060;background:#1c1529}
+.pill.pit{color:#d6dde4;border-color:#394554;background:#141a21}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.muted{color:var(--mute)}
+.small{font-size:12.5px}
+.big{font-size:30px; font-weight:700; letter-spacing:-.01em}
+ul,ol{margin:8px 0; padding-left:1.25em}
+li{margin:5px 0}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:13.5px; margin:8px 0}
+.kv dt{color:var(--mute); white-space:nowrap}
+.kv dd{margin:0}
+button{font-family:inherit; font-size:15px; cursor:pointer; border-radius:10px; border:1px solid var(--line); background:var(--bg2); color:var(--fg); padding:10px 14px}
+button:active{transform:scale(.98)}
+button.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600}
+button.ghost{background:transparent}
+button.sm{font-size:13px; padding:7px 11px}
+input,select,textarea{
+  font-family:inherit; font-size:15px; color:var(--fg); background:#0c1014;
+  border:1px solid var(--line); border-radius:10px; padding:10px 12px; width:100%;
+}
+textarea{line-height:1.6; min-height:92px; resize:vertical}
+label.fl{display:block; font-size:12.5px; color:var(--mute); margin:12px 0 5px}
+nav.tabs{
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  background:rgba(18,22,27,.96); backdrop-filter:blur(10px);
+  border-top:1px solid var(--line); padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+nav.tabs button{border:0;background:transparent;color:var(--mute);font-size:11px;padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:10px}
+nav.tabs button .ic{font-size:19px;line-height:1}
+nav.tabs button[aria-selected="true"]{color:var(--fg);background:#232b34}
+section[hidden]{display:none}
+.drill{border-left:3px solid var(--line)}
+.drill.reaction{border-left-color:var(--red)}
+.drill.vision{border-left-color:var(--blue)}
+.drill.decision{border-left-color:var(--green)}
+.drill.warmup{border-left-color:var(--yellow)}
+.drill.game{border-left-color:#9b6fe0}
+.drill.pit{border-left-color:#8899a8}
+.drill h3{margin:6px 0 2px; font-size:17px}
+.drill .aim{font-size:13px;color:var(--mute);margin:2px 0 10px}
+details{border-top:1px solid var(--line); padding:9px 0 2px}
+details summary{cursor:pointer; font-size:13.5px; color:#cfd8e2; list-style:none; display:flex; align-items:center; gap:7px}
+details summary::-webkit-details-marker{display:none}
+details summary:before{content:"＋"; color:var(--mute); font-size:12px; width:14px}
+details[open] summary:before{content:"−"}
+details .body{padding:6px 0 8px 21px; font-size:14px}
+svg.diag{width:100%; height:auto; background:#0b0e12; border:1px solid var(--line); border-radius:10px; display:block; margin:4px 0 2px}
+.setg{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0}
+.setg span{font-size:12px; background:#0c1014; border:1px solid var(--line); border-radius:8px; padding:5px 9px}
+.setg span b{color:#fff; font-weight:600}
+.timer{display:flex; align-items:center; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--line)}
+.timer .t{font-variant-numeric:tabular-nums; font-size:26px; font-weight:700; min-width:84px}
+.timer .t.run{color:var(--green)}
+.timer .t.end{color:var(--red)}
+.block{display:flex; gap:11px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--line)}
+.block:last-child{border-bottom:0}
+.block .tm{font-size:11.5px; color:var(--mute); font-variant-numeric:tabular-nums; width:52px; flex:0 0 52px; padding-top:3px}
+.block .nm{font-size:15px; font-weight:600}
+.block .ds{font-size:12.5px; color:var(--mute)}
+.block a{color:#9fc4f2; text-decoration:none; font-size:12px}
+.daysel{display:flex; gap:5px; overflow-x:auto; padding:2px 0 6px; -webkit-overflow-scrolling:touch}
+.daysel button{flex:0 0 auto; font-size:13px; padding:7px 13px; border-radius:999px}
+.daysel button[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600}
+table{width:100%; border-collapse:collapse; font-size:13.5px}
+th,td{text-align:left; padding:8px 6px; border-bottom:1px solid var(--line)}
+th{color:var(--mute); font-weight:500; font-size:12px}
+td.n{font-variant-numeric:tabular-nums}
+.pb{color:var(--yellow); font-weight:700}
+.note{background:#1a1510; border:1px solid #4a3a1a; border-radius:12px; padding:12px; font-size:13.5px}
+.note b{color:var(--yellow)}
+.warn{background:#1a1113; border:1px solid #512329; border-radius:12px; padding:12px; font-size:13.5px}
+.warn b{color:#ff9d93}
+.ok{background:#101d16; border:1px solid #1f4d35; border-radius:12px; padding:12px; font-size:13.5px}
+.chk{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px}
+.chk:last-child{border-bottom:0}
+.chk input{width:22px; height:22px; flex:0 0 22px; margin-top:1px; accent-color:var(--accent)}
+.chk label{flex:1}
+.chk input:checked + label{color:var(--mute); text-decoration:line-through}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+.footer{color:var(--mute); font-size:11.5px; text-align:center; padding:26px 10px 10px; line-height:1.8}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd">
+    <div class="dot"></div>
+    <h1>BLAZEPOD カートトレーニング</h1>
+    <div class="sub">8歳・ジュニア / ポッド4個</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============== 今日 ============== -->
+<section id="tab-today">
+  <h2 id="todayTitle">今日のメニュー</h2>
+  <p class="lead" id="todaySub"></p>
+
+  <div class="daysel" id="daysel"></div>
+
+  <div class="card" id="todayCard"></div>
+
+  <div class="row" style="margin:14px 0 4px">
+    <button class="primary" id="btnPit">🏁 レース日モード（ピット90秒）</button>
+    <button class="ghost sm" id="btnNormal" hidden>通常メニューに戻る</button>
+  </div>
+
+  <div class="note" style="margin-top:16px">
+    <b>毎日やるコツ</b><br>
+    7分で切り上げる。残り時間があっても「もう1回やりたい」で終わらせるのが、翌日また乗ってくる秘訣です。
+    反応の練習は<strong>疲れると質が落ちて逆効果</strong>になるので、長さより毎日の回数で積み上げます。
+  </div>
+
+  <h3>進め方の型（どのテーマでも同じ）</h3>
+  <ol class="small">
+    <li><b>1分</b>／ウォームアップ「めざまし4タッチ」で目と手を起こす</li>
+    <li><b>3分</b>／その日のメインドリル（下のカード）</li>
+    <li><b>2分</b>／サブドリル（別テーマを軽く）</li>
+    <li><b>1分</b>／締めのゲーム（記録更新 or 親子バトル）</li>
+  </ol>
+</section>
+
+<!-- ============== メニュー ============== -->
+<section id="tab-menu" hidden>
+  <h2>ドリル一覧</h2>
+  <p class="lead">カードを開くと、置き方の図・やり方・アプリで設定したい値・声かけが出ます。</p>
+  <div class="daysel" id="catsel"></div>
+  <div id="drillList"></div>
+</section>
+
+<!-- ============== アプリ ============== -->
+<section id="tab-app" hidden>
+  <h2>アプリの使い方</h2>
+
+  <div class="warn">
+    <b>正直に書いておきます</b><br>
+    BLAZEPODの公式サイトとヘルプセンターには、<strong>アプリの画面名や接続手順が公開されていません</strong>（確認済み）。
+    なので下の「①最初の1回」「②毎回の流れ」は、実機で確認して<strong>自分で1回だけ埋める欄</strong>にしています。
+    一度埋めれば、以後は見るだけで操作できます。<strong>使う設定は3つだけ</strong>なので、埋めるのは5分で終わります。<br>
+    <span class="small muted">※ お父さんがアプリの画面を撮って渡してくれれば、この欄は代わりに埋めてもらえます。</span>
+  </div>
+
+  <h3>① 最初の1回だけやること</h3>
+  <div class="card flat">
+    <div class="chk"><input type="checkbox" id="c1"><label for="c1">BLAZEPODアプリをiPhoneに入れて、アカウントを作る</label></div>
+    <div class="chk"><input type="checkbox" id="c2"><label for="c2">iPhoneのBluetoothをONにする（設定アプリ）</label></div>
+    <div class="chk"><input type="checkbox" id="c3"><label for="c3">ポッド4個を充電する（公称バッテリー12時間）</label></div>
+    <div class="chk"><input type="checkbox" id="c4"><label for="c4">4個すべてをアプリに登録・接続できることを確認する</label></div>
+    <div class="chk"><input type="checkbox" id="c5"><label for="c5">ポッドに <b>①②③④</b> のシールかテープを貼って番号を付ける（図と合わせるため）</label></div>
+    <div class="chk"><input type="checkbox" id="c6"><label for="c6">ドリル一覧から「<b>4個をランダムに光らせて、押すだけ</b>」のドリルを1つ見つけて<b>お気に入り</b>に入れる（これが全ドリルの土台になる）</label></div>
+    <div class="chk"><input type="checkbox" id="c7"><label for="c7">そのドリルで「時間」と「ポッド数」を変えられるか確かめる</label></div>
+    <div class="chk"><input type="checkbox" id="c8"><label for="c8">下の②③のメモを、実機を見ながら埋める</label></div>
+  </div>
+
+  <h3>② 毎回の流れ（自分のことばでメモ）</h3>
+  <p class="small muted">例：「アプリを開く → 下の〇〇をタップ → ポッドが4個つながったか確認 → ドリルを選ぶ → 時間を60秒に → スタート」</p>
+  <textarea id="memoFlow" placeholder="ここに実機の手順を書く（自動保存）"></textarea>
+
+  <h3>③ 設定項目の呼び名メモ</h3>
+  <p class="small muted">各ドリルのカードには「設定したい値」だけ書いてあります。アプリ側の呼び名をここで対応づけておくと迷いません。</p>
+  <dl class="kv">
+    <dt>ポッドの数</dt><dd class="muted">公式表記に <code>Pods</code> あり</dd>
+    <dt>人数</dt><dd class="muted">公式表記に <code>Players</code> あり</dd>
+    <dt>時間</dt><dd class="muted">公式表記に <code>Duration</code> あり</dd>
+    <dt>光り方・色</dt><dd class="muted">ポッドは8色に光る（公式）／アプリ側の項目名は不明</dd>
+  </dl>
+  <textarea id="memoTerms" placeholder="アプリでの呼び名を書く（例：ランダム点灯＝○○、色の指定＝○○、結果画面＝○○）"></textarea>
+
+  <h3>⭐ 無料プランでの運用（ここが一番大事）</h3>
+  <div class="ok">
+    <b>結論：課金しなくても、この11種は全部できます。</b><br>
+    自作ドリルは Pro（約$10.39/月）限定ですが、各ドリルの本質はアプリ設定ではなく
+    <b>ポッドの置き方と、口での約束ごと</b>にあります。
+  </div>
+  <div class="card flat small">
+    <p><b>使うアプリ設定は、たった3つだけ。</b></p>
+    <div class="setg">
+      <span>ポッド数 <b>1 / 2 / 4</b></span>
+      <span>時間 <b>30 / 45 / 60秒</b></span>
+      <span>光り方 <b>ランダム</b></span>
+    </div>
+    <p>最初に「4個をランダムに光らせて押すだけ」のドリルを1つ選んでお気に入りに入れ、
+    <b>以後ずっとそれだけを使います</b>。上の3つを変えるだけで11種すべてに対応します。</p>
+    <table style="margin-top:10px">
+      <tr><th>伸ばすもの</th><th>どこで作るか</th></tr>
+      <tr><td>反応速度</td><td>アプリの設定（ポッド数と時間）</td></tr>
+      <tr><td>周辺視野</td><td><b>置き方</b>（左右に広げる）＋<b>正面の×印</b></td></tr>
+      <tr><td>判断</td><td><b>口での約束</b>（③はさわらない／チェンジ！）</td></tr>
+    </table>
+    <p class="muted" style="margin-top:10px">まず無料で3〜4週間続けてください。記録が伸びて「もっと細かく作りたい」となったときに初めてProを検討すれば十分です。</p>
+  </div>
+  <div class="note">
+    <b>無料プランで気をつける点</b><br>
+    公式表記では無料は「1アカウント・1デバイス」。<b>親子で別アカウントにはできない</b>ので、
+    親子バトルは「交互に30秒ずつ測って数を比べる」方式にしてあります（記録はこちらのアプリに手入力）。
+  </div>
+
+  <h3>結果の見かた</h3>
+  <div class="card flat small">
+    <p>アプリが出すのは主に<b>反応速度（1回ごと）</b>と<b>合計タッチ数</b>です。<br>
+    <span class="muted">※「リーダーボード」「期間での伸びのグラフ」はPro側の機能として書かれています。無料では見られない可能性があるので、<b>伸びの管理はこちらの「記録」タブで行います</b>。</span></p>
+    <p>ただし、<b>見るべき数字は2つだけ</b>にしてください。多いと本人が混乱します。</p>
+    <ul>
+      <li><b>平均反応時間</b>（短いほど良い）… 反応ドリルで使う</li>
+      <li><b>タッチ数 / ミス数</b>… 視野・判断ドリルで使う</li>
+    </ul>
+    <p>数字は「記録」タブに手で入れてください。週1回見返すだけで十分伸びが見えます。</p>
+  </div>
+
+  <h3>安全のため</h3>
+  <div class="card flat small">
+    <ul>
+      <li>床置きは<b>滑らない場所</b>で。フローリングに靴下は転ぶ（裸足か室内シューズ）</li>
+      <li>手の届く範囲にテーブルの角・ガラス・家具がないか毎回見る</li>
+      <li>ポッドを<b>踏まない</b>約束。手でタッチするドリルが基本</li>
+      <li>レース当日は<b>汗をかくほどやらない</b>。目を覚ます程度で止める</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============== 記録 ============== -->
+<section id="tab-log" hidden>
+  <h2>記録</h2>
+  <p class="lead">測るのは週1〜2回で十分。毎回測ると「記録会」になって続きません。</p>
+
+  <div class="card">
+    <label class="fl">ドリル</label>
+    <select id="logDrill"></select>
+    <label class="fl" id="logValLabel">数値</label>
+    <input type="number" id="logVal" step="0.01" inputmode="decimal" placeholder="例 0.42">
+    <label class="fl">メモ（任意）</label>
+    <input type="text" id="logNote" placeholder="例 ねむそう / レース前日">
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="logSave">記録する</button>
+      <span class="small muted" id="logHint"></span>
+    </div>
+  </div>
+
+  <h3>自己ベスト</h3>
+  <div id="pbList"></div>
+
+  <h3>これまでの記録</h3>
+  <div id="logList"></div>
+  <div class="row" style="margin:14px 0 30px">
+    <button class="ghost sm" id="logExport">記録を書き出す（コピー用）</button>
+    <button class="ghost sm" id="logClear">全部消す</button>
+  </div>
+  <textarea id="logDump" hidden></textarea>
+</section>
+
+<div class="footer">
+  BLAZEPODは反応トレーニング用のライト。F1チームやモータースポーツチームの使用例はありますが、<br>
+  <b>ラップタイムが上がるという査読済みの研究は見つかりませんでした</b>。<br>
+  「目と手と判断を毎日起こす道具」として、楽しく続けるのがいちばんの使い方です。
+</div>
+
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="today" aria-selected="true"><span class="ic">🏁</span>今日</button>
+  <button data-tab="menu" aria-selected="false"><span class="ic">📋</span>メニュー</button>
+  <button data-tab="app" aria-selected="false"><span class="ic">📱</span>アプリ</button>
+  <button data-tab="log" aria-selected="false"><span class="ic">📈</span>記録</button>
+</nav>
+
+<script>
+/* =========================================================
+   図のレンダラ（真上から見た配置図）
+   ========================================================= */
+const POD_COLOR = {any:"#8899a8", blue:"#2f7fe0", red:"#e2483c", green:"#28a76a", yellow:"#e8b43a"};
+function diagram(d){
+  const W=320, H=d.h||200;
+  let s = `<svg class="diag" viewBox="0 0 ${W} ${H}" role="img" aria-label="ポッドの置き方">`;
+  // grid
+  s += `<defs><pattern id="g${d.id}" width="32" height="32" patternUnits="userSpaceOnUse">
+    <path d="M32 0H0V32" fill="none" stroke="#161c23" stroke-width="1"/></pattern></defs>`;
+  s += `<rect width="${W}" height="${H}" fill="url(#g${d.id})"/>`;
+  (d.lines||[]).forEach(l=>{
+    s += `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#3b4756" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  });
+  (d.marks||[]).forEach(m=>{
+    s += `<text x="${m.x}" y="${m.y}" fill="#8e9bab" font-size="11" text-anchor="middle">${m.t}</text>`;
+  });
+  // player
+  if(d.player){
+    const p=d.player;
+    s += `<circle cx="${p.x}" cy="${p.y}" r="13" fill="#2b333d" stroke="#5b6775" stroke-width="1.5"/>`;
+    s += `<text x="${p.x}" y="${p.y+4}" fill="#dfe6ee" font-size="11" text-anchor="middle">${p.t||"S"}</text>`;
+  }
+  if(d.coach){
+    const p=d.coach;
+    s += `<circle cx="${p.x}" cy="${p.y}" r="11" fill="#1b2430" stroke="#3b4756" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    s += `<text x="${p.x}" y="${p.y+4}" fill="#8e9bab" font-size="10" text-anchor="middle">父</text>`;
+  }
+  // pods
+  (d.pods||[]).forEach((p,i)=>{
+    const c = POD_COLOR[p.c||"any"];
+    s += `<circle cx="${p.x}" cy="${p.y}" r="16" fill="${c}" opacity=".16"/>`;
+    s += `<circle cx="${p.x}" cy="${p.y}" r="16" fill="none" stroke="${c}" stroke-width="2.2"/>`;
+    s += `<text x="${p.x}" y="${p.y+5}" fill="#fff" font-size="13" font-weight="600" text-anchor="middle">${p.n||(i+1)}</text>`;
+  });
+  (d.labels||[]).forEach(l=>{
+    s += `<text x="${l.x}" y="${l.y}" fill="#7d8a99" font-size="10.5" text-anchor="${l.a||"middle"}">${l.t}</text>`;
+  });
+  s += `</svg>`;
+  if(d.cap) s += `<p class="small muted" style="margin:4px 0 0">${d.cap}</p>`;
+  return s;
+}
+
+/* =========================================================
+   ドリル定義
+   ========================================================= */
+const CATS = {
+  warmup:{t:"ウォームアップ", n:"ウォームアップ"},
+  reaction:{t:"反応速度", n:"反応速度"},
+  vision:{t:"周辺視野", n:"周辺視野"},
+  decision:{t:"判断", n:"判断"},
+  game:{t:"締めのゲーム", n:"ゲーム"},
+  pit:{t:"レース日・ピット", n:"ピット"}
+};
+
+const DRILLS = [
+/* ---------- ウォームアップ ---------- */
+{
+  id:"wu1", cat:"warmup", name:"めざまし4タッチ", time:"60秒 × 1本", pods:4,
+  aim:"目・手・体を起こす。毎回これから始める",
+  diag:{id:"wu1",h:190,
+    pods:[{x:70,y:70},{x:130,y:52},{x:190,y:52},{x:250,y:70}],
+    player:{x:160,y:140},
+    labels:[{t:"手を伸ばせば届く距離（約50cm）",x:160,y:172}],
+    cap:"床に半円。立ったまま、しゃがまずに届く位置に置く。"},
+  setup:["床にポッド4個を半円に置く（左右の端まで約1.2m）","本人は半円の中心に立つ","手を伸ばして全部に届くか先に確認"],
+  how:["光ったポッドを手でタッチ、すぐ次を待つ","足はほぼ動かさない。手だけでテンポよく","60秒きっちりで終わり"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","60秒"],["光り方","ランダム"]],
+  coach:["「まずは体を起こすだけ。全力じゃなくていいよ」","数字は見ない。ここは記録しない"],
+  metric:null
+},
+/* ---------- 反応速度 ---------- */
+{
+  id:"re1", cat:"reaction", name:"左右うちわけタッチ", time:"20タッチ × 2本", pods:2,
+  aim:"いちばん素直な反応速度。ここの数字が基準になる",
+  diag:{id:"re1",h:180,
+    pods:[{x:110,y:70,n:"①"},{x:210,y:70,n:"②"}],
+    player:{x:160,y:135},
+    lines:[[110,86,145,125],[210,86,175,125]],
+    labels:[{t:"左手",x:105,y:120,a:"end"},{t:"右手",x:215,y:120,a:"start"},{t:"60cm",x:160,y:46}],
+    cap:"①は左手だけ、②は右手だけ。手を交差させない。"},
+  setup:["ポッド2個を60cmあけて正面の床に置く","①の上に左手、②の上に右手を軽く添える（浮かせる）"],
+  how:["光った側の手だけでタッチ","反対の手でとるのは無効。父が見ていて指摘する","20タッチで1本。30秒休んでもう1本"],
+  app:[["ポッド数","2個"],["人数","1人"],["終わり方","20タッチ（または30秒）"],["光り方","ランダム"]],
+  coach:["「手は浮かせて、いつでも落とせる形で待つ」","「速くしようとして体が固まったら逆に遅くなる。息を吐いて待つ」"],
+  metric:{key:"avg", label:"平均反応時間（秒）", better:"low", hint:"例 0.42（小さいほど良い）"}
+},
+{
+  id:"re2", cat:"reaction", name:"センターもどりダッシュ", time:"30秒 × 3本", pods:4,
+  aim:"反応＋体を動かす速さ。カート場で足が動く体をつくる",
+  diag:{id:"re2",h:210,
+    pods:[{x:80,y:55},{x:240,y:55},{x:80,y:155},{x:240,y:155}],
+    player:{x:160,y:105},
+    lines:[[160,105,80,55],[160,105,240,55],[160,105,80,155],[160,105,240,155]],
+    labels:[{t:"1辺 約1.5m",x:160,y:190}],
+    cap:"四角の中心からスタート。タッチしたら必ず中心に戻る。"},
+  setup:["ポッド4個を1辺1.5mくらいの四角に置く","中心に立つ。中心にテープで×を貼ると戻る位置が決まる"],
+  how:["光ったポッドまで動いて手でタッチ","タッチしたら必ず中心に戻る","30秒 → 30秒休み、を3本"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","30秒"],["光り方","ランダム"]],
+  coach:["「中心に戻るのをサボらない。戻るのが練習」","本数が落ちてきたら即やめる。疲労で遅い動きを覚えると損"],
+  metric:{key:"hits", label:"30秒のタッチ数（1本目）", better:"high", hint:"例 18"}
+},
+{
+  id:"re3", cat:"reaction", name:"スタートシグナル", time:"10本", pods:1,
+  aim:"レーススタートの形で反応する。構えて待つ時間に慣れる",
+  diag:{id:"re3",h:180,
+    pods:[{x:160,y:60,n:"①"}],
+    player:{x:160,y:130},
+    lines:[[160,76,160,114]],
+    labels:[{t:"イスに座り、ハンドルを握る形で",x:160,y:160},{t:"目の高さ・正面",x:160,y:38}],
+    cap:"ポッド1個を正面の目の高さに。壁に貼る or 父が持つ。"},
+  setup:["イスに座り、ハンドルを握る姿勢をつくる（背中はシートに、腕は軽く曲げる）","ポッド1個を正面・目の高さに置く（壁に貼るか、父が持つ）","光ったら片手を膝からパッと上げてタッチ、を合図とする"],
+  how:["「レディ」で構える。あとは黙って待つ","光った瞬間にタッチ。10本","毎回 待ち時間を変える（2秒〜8秒）。これが一番大事"],
+  app:[["ポッド数","1個"],["人数","1人"],["終わり方","10タッチ"],["待ち時間","毎回ちがう長さ（できればランダム）"]],
+  coach:["待ち時間が一定だとタイミングを予測して速く見えるだけ。<b>必ずバラバラに</b>","「フライングはゼロ点」。光る前に動いたらその本はやり直し","「待つのも練習。息を止めない」"],
+  metric:{key:"avg", label:"平均反応時間（秒）", better:"low", hint:"例 0.38"}
+},
+/* ---------- 周辺視野 ---------- */
+{
+  id:"vi1", cat:"vision", name:"よこ見ワイド", time:"45秒 × 2本", pods:4,
+  aim:"顔を正面に固定したまま、横の光に気づく。コーナーで視線が近くなるのを直す",
+  diag:{id:"vi1",h:190,
+    pods:[{x:40,y:75},{x:105,y:62},{x:215,y:62},{x:280,y:75}],
+    player:{x:160,y:140},
+    lines:[[160,126,160,40]],
+    marks:[{x:160,y:36,t:"×（見る目印）"}],
+    labels:[{t:"左右いっぱいに広げる（端から端まで約3m）",x:160,y:172}],
+    cap:"目は正面の×だけ見る。ポッドは視野の端で気づく。"},
+  setup:["正面の壁か床に、テープで<b>×</b>の目印を貼る（目の高さ）","ポッド4個を左右いっぱいに広げて床に置く（端から端まで3m目安）","本人は中心に立ち、目は×に固定"],
+  how:["<b>顔と目は×から動かさない</b>。横のポッドは視野の端で気づいてタッチ","届かないときは足を1歩だけ。顔は×のまま","45秒 → 休憩 → もう1本"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","45秒"],["光り方","ランダム"]],
+  coach:["父は<b>本人の目を見る</b>。顔が動いたら「×見て！」と一声","「見えなくても“なんか光った気がする”で手を出していい。それが周辺視野」","最初は取りこぼして当たり前。数より“顔が動かないこと”を褒める"],
+  metric:{key:"hits", label:"45秒のタッチ数", better:"high", hint:"例 22"}
+},
+{
+  id:"vi2", cat:"vision", name:"指カウント同時やり", time:"45秒 × 1本", pods:4,
+  aim:"ひとつに集中しすぎず、同時に2つを見る力（カートでは前・ミラー・計器）",
+  diag:{id:"vi2",h:190,
+    pods:[{x:45,y:80},{x:110,y:66},{x:210,y:66},{x:275,y:80}],
+    player:{x:160,y:142},
+    coach:{x:160,y:38},
+    lines:[[160,128,160,50]],
+    labels:[{t:"父は正面で指を出す（1〜5本）",x:160,y:172}],
+    cap:"「よこ見ワイド」と同じ配置。父が正面に立って指を出す。"},
+  setup:["「よこ見ワイド」と同じ配置","父は正面（×の位置）に立つ"],
+  how:["父はときどき指を1〜5本出す","本人は<b>光をタッチしながら、指の数を声に出す</b>","45秒。両方できたら成功、どちらかが止まったらそこが限界"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","45秒"],["光り方","ランダム"]],
+  coach:["できないのが普通。<b>できない状態でやること</b>に意味がある","声が出なくなったら「声だけでいいよ」と言って手を休ませる"],
+  metric:null
+},
+/* ---------- 判断 ---------- */
+{
+  id:"de1", cat:"decision", name:"③はさわるな", time:"45秒 × 2本", pods:4,
+  aim:"全部に反応しない力。押してはいけないものを見分ける（Go / No-Go）",
+  diag:{id:"de1",h:200,
+    pods:[{x:70,y:75,n:"①"},{x:130,y:58,n:"②"},{x:190,y:58,n:"③",c:"red"},{x:250,y:75,n:"④"}],
+    player:{x:160,y:145},
+    labels:[{t:"①②④＝タッチ　　③＝さわらない",x:160,y:180}],
+    cap:"③だけ「禁止ポッド」。光り方はランダムのままでOK（設定は変えない）。"},
+  setup:["「めざまし4タッチ」と同じ半円の配置","ポッドの①②③④のシールを見えるように置く","約束を<b>声に出して</b>確認：「①②④はタッチ、<b>③はさわらない</b>」"],
+  how:["光ったらタッチ。ただし<b>③が光ったら手を出さずに我慢</b>","③を押したら父が「ミス1」と数える","45秒 × 2本。ミスの数を記録する"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","45秒"],["光り方","ランダム"],["色","指定しない（無料プランでOK）"]],
+  coach:["<b>速さよりミスの少なさ</b>を褒める。「我慢できたね」が正解","ミス0が2回続いたら<b>禁止を2個</b>にする（②と③はさわらない）","さらに慣れたら禁止ポッドを毎本変える（今日は①、次は④）"],
+  metric:{key:"miss", label:"ミスの数（2本合計）", better:"low", hint:"例 3"},
+  extra:{t:"色を使えるドリルが見つかったら", b:"コミュニティドリルの中に色を指定できるものがあれば、<b>「青はタッチ・赤は我慢」</b>に置き換えてもOK（中身は同じ）。ただし番号ルールのほうが本人に説明しやすく、効果もほぼ同じなので、無理に探す必要はありません。"}
+},
+{
+  id:"de2", cat:"decision", name:"ルールチェンジ", time:"60秒 × 1本", pods:4,
+  aim:"途中でルールが変わっても切り替えられる力（コース状況・天候の変化に効く）",
+  diag:{id:"de2",h:200,
+    pods:[{x:70,y:75,n:"①",c:"red"},{x:130,y:58,n:"②"},{x:190,y:58,n:"③",c:"red"},{x:250,y:75,n:"④"}],
+    player:{x:160,y:145},
+    coach:{x:285,y:145},
+    labels:[{t:"「チェンジ！」で 禁止 ③ → ① に入れ替わる",x:160,y:180}],
+    cap:"アプリの設定は「③はさわるな」とまったく同じ。変わるのは口での約束だけ。"},
+  setup:["「③はさわるな」と同じ配置・同じ設定で始める"],
+  how:["最初は<b>③が禁止</b>","父が好きなタイミングで「<b>チェンジ！</b>」と言う → 禁止が<b>①</b>に入れ替わる（③はタッチしてよくなる）","60秒で2〜3回チェンジする。①↔③を行き来させる"],
+  app:[["ポッド数","4個"],["人数","1人"],["時間","60秒"],["光り方","ランダム"],["色","指定しない（無料プランでOK）"]],
+  coach:["チェンジ直後は必ずミスる。<b>それが普通</b>と先に伝えておく","「切り替えが速かったね」と、戻りの速さを褒める","混乱しすぎたらチェンジは1回だけに減らす"],
+  metric:null
+},
+{
+  id:"de3", cat:"decision", name:"番号コール", time:"20本", pods:4,
+  aim:"目で見たものと耳で聞いたものを合わせて決める（コーナーの看板＋コーチの合図）",
+  diag:{id:"de3",h:190,
+    pods:[{x:70,y:70,n:"①"},{x:130,y:55,n:"②"},{x:190,y:55,n:"③"},{x:250,y:70,n:"④"}],
+    player:{x:160,y:140},
+    coach:{x:285,y:140},
+    labels:[{t:"父が番号を言う → その番号が光っていたらタッチ",x:160,y:172}],
+    cap:"ポッドに①②③④のシールを貼っておく。"},
+  setup:["ポッドに①②③④のシールを貼る","半円に置く（「めざまし4タッチ」と同じ）"],
+  how:["父が番号を1つ言う（例「さん！」）","<b>その番号が光っていたらタッチ。光っていなければ何もしない</b>","20本"],
+  app:[["ポッド数","4個"],["人数","1人"],["終わり方","20タッチ（または60秒）"],["光り方","ランダム"]],
+  coach:["ゆっくりでいい。ここは速さの練習ではない","慣れたら父のコールを早口にする"],
+  metric:null
+},
+/* ---------- 締めのゲーム ---------- */
+{
+  id:"ga1", cat:"game", name:"親子バトル", time:"30秒 × 2本", pods:4,
+  aim:"楽しく終わる。負けん気のスイッチを入れる",
+  diag:{id:"ga1",h:190,
+    pods:[{x:85,y:60},{x:85,y:130},{x:235,y:60},{x:235,y:130}],
+    player:{x:85,y:95},
+    coach:{x:235,y:95},
+    labels:[{t:"本人 2個",x:85,y:168},{t:"父 2個",x:235,y:168}],
+    cap:"左右に分かれて2個ずつ。30秒でタッチ数を競う。"},
+  setup:["左右に2個ずつ分けて置く","本人と父がそれぞれ自分の2個の前に立つ"],
+  how:["30秒でタッチ数の多いほうが勝ち","父は<b>たまに負ける</b>。全勝すると続かない","2本やって終わり"],
+  app:[["ポッド数","4個"],["人数","1人ずつ交互"],["時間","30秒"],["補足","無料プランは1アカウントなので、交互に30秒ずつ測って数を比べるのが確実"]],
+  coach:["ここは記録しない。笑って終わるのが目的"],
+  metric:null
+},
+{
+  id:"ga2", cat:"game", name:"自己ベストチャレンジ", time:"20タッチ × 1本", pods:2,
+  aim:"週1回だけ。自分の記録と戦う",
+  diag:{id:"ga2",h:170,
+    pods:[{x:110,y:65,n:"①"},{x:210,y:65,n:"②"}],
+    player:{x:160,y:128},
+    labels:[{t:"「左右うちわけタッチ」と同じ配置",x:160,y:155}],
+    cap:"測定用。条件を毎回そろえる（同じ場所・同じ距離・同じ時間帯）。"},
+  setup:["「左右うちわけタッチ」とまったく同じ配置にする","毎回同じ曜日・同じ時間にやると比べられる"],
+  how:["20タッチ1本だけ。全力","平均反応時間を「記録」タブに入れる"],
+  app:[["ポッド数","2個"],["人数","1人"],["終わり方","20タッチ"],["光り方","ランダム"]],
+  coach:["更新できなくても気にしない。体調で0.05秒は動く","4週間の平均で見る。1回の数字では判断しない"],
+  metric:{key:"avg", label:"平均反応時間（秒）", better:"low", hint:"例 0.40"}
+},
+/* ---------- ピット ---------- */
+{
+  id:"pi1", cat:"pit", name:"ピット・プライミング", time:"合計90秒", pods:2,
+  aim:"走行の10〜15分前に目と手を起こす。F1ドライバーがやっている“プライミング”の考え方",
+  diag:{id:"pi1",h:180,
+    pods:[{x:110,y:55,c:"blue"},{x:210,y:55,c:"blue"}],
+    player:{x:160,y:125},
+    labels:[{t:"目の高さ（壁・テント支柱・父が持つ）",x:160,y:155},{t:"80cm〜1m",x:160,y:34}],
+    cap:"立ったまま、ヘルメットをかぶる前に。汗をかくほどやらない。"},
+  setup:["ポッド2個を目の高さに、80cm〜1mあけて固定（壁・テント支柱・父が持つ）","立ったまま、腕は軽く曲げて構える"],
+  how:["<b>45秒</b>：光ったほうを手でタッチ（全力）","<b>15秒</b>：休む","<b>30秒</b>：もう1本。終わり","走行の10〜15分前に実施。これ以上はやらない"],
+  app:[["ポッド数","2個"],["人数","1人"],["時間","45秒 → 30秒"],["光り方","ランダム"]],
+  coach:["目的は<b>目覚まし</b>。疲れさせたら逆効果","数字は見ない。レース前に悪い数字を見せない","緊張が強い日は本数を減らして、声かけを多めに"],
+  metric:null
+}
+];
+
+const byId = id => DRILLS.find(d=>d.id===id);
+
+/* =========================================================
+   週のプログラム
+   ========================================================= */
+const WEEK = {
+  1:{theme:"反応速度の日", color:"reaction", blocks:[["0:00","wu1"],["1:00","re1"],["4:00","vi1"],["6:00","ga1"]]},
+  2:{theme:"周辺視野の日", color:"vision",   blocks:[["0:00","wu1"],["1:00","vi1"],["4:00","re3"],["6:00","ga1"]]},
+  3:{theme:"判断の日",     color:"decision", blocks:[["0:00","wu1"],["1:00","de1"],["4:00","re1"],["6:00","ga1"]]},
+  4:{theme:"反応速度の日（動く）", color:"reaction", blocks:[["0:00","wu1"],["1:00","re2"],["4:00","de3"],["6:00","ga1"]]},
+  5:{theme:"周辺視野の日（同時）", color:"vision", blocks:[["0:00","wu1"],["1:00","vi1"],["3:00","vi2"],["6:00","ga1"]]},
+  6:{theme:"判断の日（切り替え）", color:"decision", blocks:[["0:00","wu1"],["1:00","de1"],["3:30","de2"],["5:30","ga2"]]},
+  0:{theme:"おやすみ / 気分でバトル", color:"game", blocks:[["0:00","wu1"],["1:00","ga1"],["3:00","ga2"]]}
+};
+const PITDAY = {theme:"レース日モード", color:"pit", blocks:[["-15分","pi1"]]};
+const DAYNAMES = ["日","月","火","水","木","金","土"];
+
+/* =========================================================
+   描画
+   ========================================================= */
+function setg(arr){
+  return `<div class="setg">${arr.map(([k,v])=>`<span>${k} <b>${v}</b></span>`).join("")}</div>`;
+}
+function drillCard(d, open){
+  const cat = CATS[d.cat];
+  let h = `<div class="card drill ${d.cat}" id="d-${d.id}">
+    <div class="row"><span class="pill ${d.cat}">${cat.n}</span><span class="pill">ポッド ${d.pods}個</span><span class="pill">${d.time}</span></div>
+    <h3>${d.name}</h3>
+    <div class="aim">${d.aim}</div>
+    ${diagram(d.diag)}
+    <details ${open?"open":""}><summary>置き方</summary><div class="body"><ul>${d.setup.map(x=>`<li>${x}</li>`).join("")}</ul></div></details>
+    <details ${open?"open":""}><summary>やり方</summary><div class="body"><ol>${d.how.map(x=>`<li>${x}</li>`).join("")}</ol></div></details>
+    <details><summary>アプリで設定したい値</summary><div class="body">${setg(d.app)}
+      <p class="small muted">アプリ側の呼び名は「アプリ」タブのメモ欄に対応づけておくと迷いません。</p>
+      ${d.extra?`<div class="note" style="margin-top:8px"><b>${d.extra.t}</b><br>${d.extra.b}</div>`:""}
+    </div></details>
+    <details><summary>父の声かけ・注意点</summary><div class="body"><ul>${d.coach.map(x=>`<li>${x}</li>`).join("")}</ul></div></details>`;
+  const secs = parseTime(d.time);
+  if(secs) h += `<div class="timer">
+      <button class="sm" data-timer="${d.id}" data-sec="${secs}">▶ ${secs}秒</button>
+      <div class="t" id="t-${d.id}">${secs}</div>
+      <button class="sm ghost" data-reset="${d.id}">リセット</button>
+    </div>`;
+  h += `</div>`;
+  return h;
+}
+function parseTime(t){
+  const m = t.match(/(\d+)\s*秒/);
+  return m ? parseInt(m[1],10) : null;
+}
+
+/* ---- 今日 ---- */
+let viewDay = new Date().getDay();
+let pitMode = false;
+
+function renderDaysel(){
+  const el = document.getElementById("daysel");
+  el.innerHTML = [1,2,3,4,5,6,0].map(i=>
+    `<button data-day="${i}" aria-pressed="${!pitMode&&i===viewDay}">${DAYNAMES[i]}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    viewDay = parseInt(b.dataset.day,10); pitMode=false; renderToday();
+  });
+}
+function renderToday(){
+  const prog = pitMode ? PITDAY : WEEK[viewDay];
+  const isToday = !pitMode && viewDay===new Date().getDay();
+  document.getElementById("todayTitle").textContent = pitMode ? "🏁 レース日モード" : (isToday?"今日のメニュー":DAYNAMES[viewDay]+"曜のメニュー");
+  document.getElementById("todaySub").innerHTML = pitMode
+    ? "走行の10〜15分前。目を覚ます程度で止めるのが大事。"
+    : `<b>${prog.theme}</b>　合計約7分`;
+  document.getElementById("btnNormal").hidden = !pitMode;
+  const card = document.getElementById("todayCard");
+  card.innerHTML = prog.blocks.map(([tm,id])=>{
+    const d = byId(id);
+    return `<div class="block">
+      <div class="tm">${tm}</div>
+      <div style="flex:1">
+        <div class="nm">${d.name}</div>
+        <div class="ds">${d.time}・ポッド${d.pods}個 — ${d.aim}</div>
+        <a href="#d-${d.id}" data-jump="${d.id}">やり方を見る →</a>
+      </div>
+    </div>`;
+  }).join("");
+  card.querySelectorAll("[data-jump]").forEach(a=>a.onclick=e=>{
+    e.preventDefault(); showTab("menu"); setCat("all");
+    setTimeout(()=>{
+      const t = document.getElementById("d-"+a.dataset.jump);
+      if(t){ t.scrollIntoView({behavior:"smooth",block:"start"});
+        t.querySelectorAll("details").forEach((x,i)=>{ if(i<2) x.open=true; }); }
+    },60);
+  });
+  renderDaysel();
+}
+document.getElementById("btnPit").onclick=()=>{pitMode=true;renderToday();};
+document.getElementById("btnNormal").onclick=()=>{pitMode=false;renderToday();};
+
+/* ---- メニュー ---- */
+let curCat = "all";
+function setCat(c){
+  curCat = c;
+  const sel = document.getElementById("catsel");
+  const keys = ["all",...Object.keys(CATS)];
+  sel.innerHTML = keys.map(k=>
+    `<button data-cat="${k}" aria-pressed="${k===curCat}">${k==="all"?"すべて":CATS[k].t}</button>`).join("");
+  sel.querySelectorAll("button").forEach(b=>b.onclick=()=>setCat(b.dataset.cat));
+  const list = DRILLS.filter(d=>curCat==="all"||d.cat===curCat);
+  document.getElementById("drillList").innerHTML = list.map(d=>drillCard(d,false)).join("");
+  bindTimers();
+}
+
+/* ---- タイマー ---- */
+let timers = {};
+function beep(freq, dur){
+  try{
+    const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    window._ac = window._ac || new AC();
+    const ac = window._ac; if(ac.state==="suspended") ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(.001, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.25, ac.currentTime+.01);
+    g.gain.exponentialRampToValueAtTime(.001, ac.currentTime+dur);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+dur+.02);
+  }catch(e){}
+}
+function bindTimers(){
+  document.querySelectorAll("[data-timer]").forEach(b=>{
+    b.onclick = ()=>{
+      const id=b.dataset.timer, total=parseInt(b.dataset.sec,10);
+      const el=document.getElementById("t-"+id);
+      if(timers[id]){ clearInterval(timers[id]); timers[id]=null; b.textContent="▶ 再開"; el.classList.remove("run"); return; }
+      let left = parseInt(el.textContent,10); if(isNaN(left)||left<=0) left = total;
+      b.textContent="⏸ 停止"; el.classList.add("run"); el.classList.remove("end");
+      beep(880,.12);
+      timers[id]=setInterval(()=>{
+        left--; el.textContent=left;
+        if(left<=3 && left>0) beep(660,.09);
+        if(left<=0){ clearInterval(timers[id]); timers[id]=null;
+          b.textContent="▶ "+total+"秒"; el.classList.remove("run"); el.classList.add("end");
+          beep(440,.45); if(navigator.vibrate) navigator.vibrate([120,60,120]); }
+      },1000);
+    };
+  });
+  document.querySelectorAll("[data-reset]").forEach(b=>{
+    b.onclick=()=>{
+      const id=b.dataset.reset;
+      if(timers[id]){clearInterval(timers[id]);timers[id]=null;}
+      const btn=document.querySelector(`[data-timer="${id}"]`);
+      const total=parseInt(btn.dataset.sec,10);
+      const el=document.getElementById("t-"+id);
+      el.textContent=total; el.classList.remove("run","end"); btn.textContent="▶ "+total+"秒";
+    };
+  });
+}
+
+/* =========================================================
+   保存（メモ・チェック・記録）
+   ========================================================= */
+const LS = {
+  get(k,f){ try{ const v=localStorage.getItem(k); return v==null?f:JSON.parse(v); }catch(e){ return f; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+["memoFlow","memoTerms"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.value = LS.get("bp_"+id,"");
+  el.addEventListener("input",()=>LS.set("bp_"+id,el.value));
+});
+document.querySelectorAll(".chk input").forEach(el=>{
+  el.checked = LS.get("bp_chk_"+el.id,false);
+  el.addEventListener("change",()=>LS.set("bp_chk_"+el.id,el.checked));
+});
+
+const METRIC_DRILLS = DRILLS.filter(d=>d.metric);
+const logDrill=document.getElementById("logDrill");
+logDrill.innerHTML = METRIC_DRILLS.map(d=>`<option value="${d.id}">${d.name}（${d.metric.label}）</option>`).join("");
+function syncLogLabels(){
+  const d = byId(logDrill.value);
+  document.getElementById("logValLabel").textContent = d.metric.label;
+  document.getElementById("logVal").placeholder = d.metric.hint;
+  document.getElementById("logHint").textContent = d.metric.better==="low"?"小さいほど良い":"大きいほど良い";
+}
+logDrill.onchange=syncLogLabels; syncLogLabels();
+
+function records(){ return LS.get("bp_records",[]); }
+function saveRecords(r){ LS.set("bp_records",r); renderLog(); }
+document.getElementById("logSave").onclick=()=>{
+  const v = parseFloat(document.getElementById("logVal").value);
+  if(isNaN(v)){ alert("数値を入れてください"); return; }
+  const r = records();
+  r.push({d:logDrill.value, v:v, note:document.getElementById("logNote").value.trim(), ts:Date.now()});
+  document.getElementById("logVal").value=""; document.getElementById("logNote").value="";
+  saveRecords(r); beep(880,.1);
+};
+function fmtDate(ts){ const d=new Date(ts); return `${d.getMonth()+1}/${d.getDate()}`; }
+function renderLog(){
+  const r = records();
+  // 自己ベスト
+  const pbs = METRIC_DRILLS.map(d=>{
+    const vs = r.filter(x=>x.d===d.id);
+    if(!vs.length) return null;
+    const best = vs.reduce((a,b)=> (d.metric.better==="low" ? (b.v<a.v?b:a) : (b.v>a.v?b:a)));
+    return {d, best, n:vs.length};
+  }).filter(Boolean);
+  document.getElementById("pbList").innerHTML = pbs.length
+    ? `<div class="card flat"><table><tr><th>ドリル</th><th>自己ベスト</th><th>回数</th></tr>${
+        pbs.map(p=>`<tr><td>${p.d.name}</td><td class="n pb">${p.best.v}</td><td class="n muted">${p.n}</td></tr>`).join("")
+      }</table></div>`
+    : `<div class="card flat small muted">まだ記録がありません。まずは「左右うちわけタッチ」の平均反応時間を1回入れてみてください。それが基準になります。</div>`;
+  // 一覧
+  const sorted = [...r].sort((a,b)=>b.ts-a.ts).slice(0,40);
+  document.getElementById("logList").innerHTML = sorted.length
+    ? `<div class="card flat"><table><tr><th>日</th><th>ドリル</th><th>値</th><th>メモ</th></tr>${
+        sorted.map(x=>{
+          const d=byId(x.d);
+          return `<tr><td class="n muted">${fmtDate(x.ts)}</td><td>${d?d.name:x.d}</td><td class="n">${x.v}</td><td class="muted small">${x.note||""}</td></tr>`;
+        }).join("")
+      }</table></div>`
+    : `<div class="card flat small muted">—</div>`;
+}
+document.getElementById("logExport").onclick=()=>{
+  const ta=document.getElementById("logDump");
+  ta.hidden=false;
+  ta.value = records().sort((a,b)=>a.ts-b.ts).map(x=>{
+    const d=byId(x.d); const dt=new Date(x.ts);
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}\t${d?d.name:x.d}\t${x.v}\t${x.note||""}`;
+  }).join("\n");
+  ta.select();
+};
+document.getElementById("logClear").onclick=()=>{ if(confirm("記録を全部消します。よろしいですか？")) saveRecords([]); };
+
+/* =========================================================
+   タブ
+   ========================================================= */
+function showTab(name){
+  ["today","menu","app","log"].forEach(t=>{
+    document.getElementById("tab-"+t).hidden = (t!==name);
+  });
+  document.querySelectorAll("#tabs button").forEach(b=>
+    b.setAttribute("aria-selected", b.dataset.tab===name));
+  window.scrollTo({top:0});
+}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* init */
+renderToday();
+setCat("all");
+renderLog();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
