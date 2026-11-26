@@ -104,6 +104,23 @@ svg.diag{width:100%; height:auto; background:#0b0e12; border:1px solid var(--lin
 .timer .t{font-variant-numeric:tabular-nums; font-size:26px; font-weight:700; min-width:84px}
 .timer .t.run{color:var(--green)}
 .timer .t.end{color:var(--red)}
+/* --- グラフ --- */
+.chart{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 12px 8px;margin:10px 0}
+.chart .ct{display:flex;align-items:baseline;gap:7px;margin-bottom:2px}
+.chart .ct .dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.chart .ct .nm{font-size:14px;font-weight:600}
+.chart .ct .un{font-size:11px;color:var(--mute);margin-left:auto}
+.chart svg{width:100%;height:auto;display:block;margin-top:4px;overflow:visible}
+.chart .rd{font-size:12px;color:var(--mute);min-height:20px;margin-top:4px;text-align:center}
+.chart .sm2{display:flex;gap:14px;font-size:11.5px;color:var(--mute);margin-top:2px;flex-wrap:wrap}
+.chart .sm2 b{color:var(--fg);font-variant-numeric:tabular-nums}
+.chart .good{color:#0ca30c;font-weight:700}
+.chart .flat2{color:var(--mute)}
+.racerow{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.racerow:last-child{border-bottom:0}
+.racerow .dt{color:var(--mute);font-size:11.5px;width:52px;flex:0 0 52px;font-variant-numeric:tabular-nums}
+.racerow .pos{font-weight:700;font-variant-numeric:tabular-nums}
+.racerow .del{margin-left:auto;color:var(--mute);font-size:11px;background:none;border:0;padding:4px 6px}
 .plansel{display:flex;align-items:center;gap:6px;padding:0 16px 10px;font-size:12px}
 .plansel .lbl{color:var(--mute);font-size:11px}
 .plansel button{padding:4px 14px;font-size:12.5px;border-radius:999px;background:#0c1014;color:var(--mute);border:1px solid var(--line)}
@@ -565,13 +582,40 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
     </div>
   </div>
 
+  <h3>伸びのグラフ</h3>
+  <div id="chartList"></div>
+
   <h3>自己ベスト</h3>
   <div id="pbList"></div>
+
+  <h3>🏁 レース結果</h3>
+  <p class="small muted">トレーニングとの関係を見るために残します。終わった日に入れてください。</p>
+  <details class="card" style="border-top:0;padding:14px">
+    <summary style="font-size:14px;color:#cfd8e2">レース結果を追加する</summary>
+    <div style="padding-top:6px">
+      <label class="fl">日付</label>
+      <input type="date" id="rcDate">
+      <label class="fl">大会名・コース</label>
+      <input type="text" id="rcName" placeholder="例 〇〇カップ 第3戦 / 〇〇サーキット">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div><label class="fl">予選</label><input type="number" id="rcQual" inputmode="numeric" placeholder="位"></div>
+        <div><label class="fl">決勝</label><input type="number" id="rcFinal" inputmode="numeric" placeholder="位"></div>
+        <div><label class="fl">出走台数</label><input type="number" id="rcEntries" inputmode="numeric" placeholder="台"></div>
+      </div>
+      <label class="fl">メモ（スタートの出来・天候・調子など）</label>
+      <textarea id="rcNote" rows="2" placeholder="例 スタートで2台抜いた / 雨 / 前日よく寝た"></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="primary" id="rcSave">レースを記録する</button>
+      </div>
+    </div>
+  </details>
+  <div id="raceList"></div>
 
   <h3>これまでの記録</h3>
   <div id="logList"></div>
   <div class="row" style="margin:14px 0 30px">
-    <button class="ghost sm" id="logExport">記録を書き出す（コピー用）</button>
+    <button class="primary sm" id="logShare">📤 記録を送る</button>
+    <button class="ghost sm" id="logExport">コピー用に表示</button>
     <button class="ghost sm" id="logClear">全部消す</button>
   </div>
   <textarea id="logDump" hidden></textarea>
@@ -1069,7 +1113,7 @@ function syncLogLabels(){
 logDrill.onchange=syncLogLabels; syncLogLabels();
 
 function records(){ return LS.get("bp_records",[]); }
-function saveRecords(r){ LS.set("bp_records",r); renderLog(); }
+function saveRecords(r){ LS.set("bp_records",r); renderLog(); renderCharts(); }
 document.getElementById("logSave").onclick=()=>{
   const v = parseFloat(document.getElementById("logVal").value);
   if(isNaN(v)){ alert("数値を入れてください"); return; }
@@ -1104,6 +1148,183 @@ function renderLog(){
       }</table></div>`
     : `<div class="card flat small muted">—</div>`;
 }
+/* =========================================================
+   伸びのグラフ（小さな折れ線を指標ごとに1つ＝スモールマルチプル）
+   ・1枚につき1系列なので凡例は置かず、タイトルで示す
+   ・値ラベルは「自己ベスト」と「最新」だけ。全点には付けない
+   ・レース日は縦の破線で重ねる
+   ========================================================= */
+const CAT_COLOR = {reaction:"#e2483c", vision:"#2f7fe0", decision:"#28a76a", game:"#9b6fe0", warmup:"#e8b43a", pit:"#8899a8"};
+const AX = "#898781", GRID = "#2c3642";
+
+function fmtMD(ts){ const d=new Date(ts); return `${d.getMonth()+1}/${d.getDate()}`; }
+
+function chartSVG(drill, recs, races){
+  const W=320, H=132, L=38, R=12, T=14, B=24;
+  const col = CAT_COLOR[drill.cat] || "#2f7fe0";
+  const pts = recs.slice().sort((a,b)=>a.ts-b.ts);
+  const vs = pts.map(p=>p.v);
+  let lo=Math.min(...vs), hi=Math.max(...vs);
+  if(lo===hi){ const pad=Math.max(Math.abs(lo)*0.1,1); lo-=pad; hi+=pad; }
+  else { const pad=(hi-lo)*0.18; lo-=pad; hi+=pad; }
+  const t0=pts[0].ts, t1=pts[pts.length-1].ts;
+  const X = ts => pts.length===1 ? (L+(W-L-R)/2) : L + (ts-t0)/(t1-t0)*(W-L-R);
+  const Y = v  => T + (hi-v)/(hi-lo)*(H-T-B);
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${drill.name}の推移">`;
+  // グリッド（上下2本だけ・控えめ）
+  [hi,lo].forEach(v=>{
+    s += `<line x1="${L}" y1="${Y(v).toFixed(1)}" x2="${W-R}" y2="${Y(v).toFixed(1)}" stroke="${GRID}" stroke-width="1"/>`;
+    s += `<text x="${L-6}" y="${(Y(v)+3.5).toFixed(1)}" fill="${AX}" font-size="9.5" text-anchor="end">${Math.round(v)}</text>`;
+  });
+  // レース日の縦線
+  (races||[]).forEach(r=>{
+    if(pts.length<2 || r.ts<t0 || r.ts>t1) return;
+    const x=X(r.ts).toFixed(1);
+    s += `<line x1="${x}" y1="${T-6}" x2="${x}" y2="${H-B}" stroke="${AX}" stroke-width="1" stroke-dasharray="3 3" opacity=".65"/>`;
+    s += `<text x="${x}" y="${T-8}" font-size="9" text-anchor="middle">🏁</text>`;
+  });
+  // 折れ線
+  if(pts.length>1){
+    s += `<polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${
+      pts.map(p=>`${X(p.ts).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ")}"/>`;
+  }
+  // 自己ベストの位置
+  const better = drill.metric.better;
+  const best = pts.reduce((a,b)=> (better==="low" ? (b.v<=a.v?b:a) : (b.v>=a.v?b:a)));
+  const last = pts[pts.length-1];
+  // 点（8px＝r4）。重なり防止に面の色でリングを付ける
+  pts.forEach(p=>{
+    const isK = (p===best||p===last);
+    s += `<circle cx="${X(p.ts).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="${isK?4.5:3.5}" fill="${isK?col:"#1d242c"}" stroke="${col}" stroke-width="2"/>`;
+    s += `<circle class="hit" data-v="${p.v}" data-ts="${p.ts}" cx="${X(p.ts).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="13" fill="transparent"/>`;
+  });
+  // 値ラベルは2つだけ（文字色はテキスト色。色は点が担当）
+  const lab=(p,txt,dy)=>`<text x="${X(p.ts).toFixed(1)}" y="${(Y(p.v)+dy).toFixed(1)}" fill="#eef2f6" font-size="10.5" font-weight="700" text-anchor="middle">${txt}</text>`;
+  if(best!==last) s += lab(best, `★${best.v}`, better==="low"? 15 : -9);
+  s += lab(last, `${last.v}`, better==="low"? -9 : -9);
+  // 日付は両端だけ
+  s += `<text x="${L}" y="${H-7}" fill="${AX}" font-size="9.5" text-anchor="start">${fmtMD(t0)}</text>`;
+  if(pts.length>1) s += `<text x="${W-R}" y="${H-7}" fill="${AX}" font-size="9.5" text-anchor="end">${fmtMD(t1)}</text>`;
+  s += `</svg>`;
+  return {svg:s, best, last, first:pts[0], n:pts.length};
+}
+
+function renderCharts(){
+  const r = records(), races = raceRecords();
+  const host = document.getElementById("chartList");
+  const blocks = METRIC_DRILLS.map(d=>{
+    const mine = r.filter(x=>x.d===d.id);
+    if(!mine.length) return "";
+    const col = CAT_COLOR[d.cat] || "#2f7fe0";
+    if(mine.length===1){
+      return `<div class="chart"><div class="ct"><span class="dot" style="background:${col}"></span>
+        <span class="nm">${d.name}</span><span class="un">${d.metric.label}</span></div>
+        <div class="rd">いまの記録 <b style="color:#eef2f6;font-size:17px">${mine[0].v}</b>　— あと1回入れるとグラフが出ます</div></div>`;
+    }
+    const c = chartSVG(d, mine, races);
+    const diff = c.last.v - c.first.v;
+    const improved = d.metric.better==="low" ? diff<0 : diff>0;
+    const arrow = diff===0 ? "→" : (diff<0 ? "↓" : "↑");
+    const dtxt = diff===0 ? `<span class="flat2">変化なし</span>`
+      : `<span class="${improved?"good":"flat2"}">${arrow} ${Math.abs(Math.round(diff*100)/100)}${improved?" 伸びた":""}</span>`;
+    return `<div class="chart" data-chart="${d.id}">
+      <div class="ct"><span class="dot" style="background:${col}"></span>
+        <span class="nm">${d.name}</span><span class="un">${d.metric.label}</span></div>
+      ${c.svg}
+      <div class="sm2">
+        <span>最新 <b>${c.last.v}</b></span>
+        <span>自己ベスト <b>★${c.best.v}</b></span>
+        <span>初回から ${dtxt}</span>
+        <span>${c.n}回</span>
+      </div>
+      <div class="rd" id="rd-${d.id}">点をタップすると日付が出ます</div>
+    </div>`;
+  }).filter(Boolean).join("");
+  host.innerHTML = blocks || `<div class="card flat small muted">まだ記録がありません。「左右うちわけタッチ」の Avg. Reaction を1回入れてみてください。</div>`;
+  // タップで読み取り
+  host.querySelectorAll("[data-chart]").forEach(box=>{
+    const id=box.dataset.chart, rd=document.getElementById("rd-"+id);
+    box.querySelectorAll("circle.hit").forEach(c=>{
+      const show=()=>{
+        const ts=+c.dataset.ts, d=new Date(ts);
+        const rec=records().find(x=>x.ts===ts);
+        rd.innerHTML = `<b style="color:#eef2f6">${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}</b> … ${c.dataset.v}${rec&&rec.note?`　<span class="muted">${rec.note}</span>`:""}`;
+      };
+      c.style.cursor="pointer";
+      c.addEventListener("click", show);
+      c.addEventListener("touchstart", show, {passive:true});
+    });
+  });
+}
+
+/* =========================================================
+   レース結果
+   ========================================================= */
+function raceRecords(){ return LS.get("bp_races",[]); }
+function saveRaces(x){ LS.set("bp_races",x); renderRaces(); renderCharts(); }
+document.getElementById("rcSave").onclick=()=>{
+  const dv=document.getElementById("rcDate").value;
+  const name=document.getElementById("rcName").value.trim();
+  if(!dv){ alert("日付を入れてください"); return; }
+  const g=id=>{ const v=document.getElementById(id).value; return v===""?null:+v; };
+  const list=raceRecords();
+  list.push({ts:new Date(dv+"T12:00:00").getTime(), name, qual:g("rcQual"), final:g("rcFinal"),
+              entries:g("rcEntries"), note:document.getElementById("rcNote").value.trim()});
+  ["rcName","rcQual","rcFinal","rcEntries","rcNote"].forEach(i=>document.getElementById(i).value="");
+  saveRaces(list); beep(880,.1);
+};
+function renderRaces(){
+  const list=raceRecords().slice().sort((a,b)=>b.ts-a.ts);
+  const host=document.getElementById("raceList");
+  if(!list.length){ host.innerHTML=`<div class="card flat small muted">まだレース記録がありません。</div>`; return; }
+  host.innerHTML = `<div class="card flat">` + list.map((r,i)=>{
+    const pos = r.final!=null ? `<span class="pos">${r.final}位</span>` : "";
+    const q   = r.qual!=null ? `<span class="muted small">予選${r.qual}位</span>` : "";
+    const e   = r.entries!=null ? `<span class="muted small">/${r.entries}台</span>` : "";
+    return `<div class="racerow"><div class="dt">${fmtMD(r.ts)}</div>
+      <div style="flex:1">
+        <div>${pos} ${q} ${e}</div>
+        <div class="small muted">${r.name||""}${r.note?`　${r.note}`:""}</div>
+      </div>
+      <button class="del" data-rdel="${r.ts}">削除</button></div>`;
+  }).join("") + `</div>`;
+  host.querySelectorAll("[data-rdel]").forEach(b=>b.onclick=()=>{
+    if(!confirm("このレース記録を削除しますか？")) return;
+    saveRaces(raceRecords().filter(x=>x.ts!==+b.dataset.rdel));
+  });
+}
+
+function recordsAsText(){
+  const r = records().sort((a,b)=>a.ts-b.ts);
+  if(!r.length) return "";
+  const iso = ts=>{ const d=new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+  let out = "BLAZEPODトレーニング記録\n\n[ドリル]\n日付\tドリル\t指標\t値\tメモ\n";
+  out += r.map(x=>{
+    const d=byId(x.d);
+    return `${iso(x.ts)}\t${d?d.name:x.d}\t${d?d.metric.label:""}\t${x.v}\t${x.note||""}`;
+  }).join("\n");
+  const races = raceRecords().slice().sort((a,b)=>a.ts-b.ts);
+  if(races.length){
+    out += "\n\n[レース]\n日付\t大会・コース\t予選\t決勝\t出走\tメモ\n";
+    out += races.map(x=>`${iso(x.ts)}\t${x.name||""}\t${x.qual??""}\t${x.final??""}\t${x.entries??""}\t${x.note||""}`).join("\n");
+  }
+  return out;
+}
+document.getElementById("logShare").onclick=async ()=>{
+  const txt = recordsAsText();
+  if(!txt){ alert("まだ記録がありません"); return; }
+  LS.set("bp_lastShare", Date.now());
+  try{
+    if(navigator.share){ await navigator.share({title:"BLAZEPODトレーニング記録", text:txt}); return; }
+    await navigator.clipboard.writeText(txt);
+    alert("記録をコピーしました。貼り付けて送ってください。");
+  }catch(e){
+    const ta=document.getElementById("logDump");
+    ta.hidden=false; ta.value=txt; ta.select();
+  }
+};
 document.getElementById("logExport").onclick=()=>{
   const ta=document.getElementById("logDump");
   ta.hidden=false;
@@ -1148,6 +1369,8 @@ document.querySelectorAll(".plansel button").forEach(b=>
 
 /* init */
 setPlan(LS.get("bp_plan","free"));
+renderRaces();
+renderCharts();
 renderToday();
 setCat("all");
 renderLog();
