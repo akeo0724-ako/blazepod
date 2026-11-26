@@ -104,6 +104,15 @@ svg.diag{width:100%; height:auto; background:#0b0e12; border:1px solid var(--lin
 .timer .t{font-variant-numeric:tabular-nums; font-size:26px; font-weight:700; min-width:84px}
 .timer .t.run{color:var(--green)}
 .timer .t.end{color:var(--red)}
+.plansel{display:flex;align-items:center;gap:6px;padding:0 16px 10px;font-size:12px}
+.plansel .lbl{color:var(--mute);font-size:11px}
+.plansel button{padding:4px 14px;font-size:12.5px;border-radius:999px;background:#0c1014;color:var(--mute);border:1px solid var(--line)}
+.plansel button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.plansel .hint{color:var(--mute);font-size:10.5px;margin-left:auto;text-align:right;line-height:1.3}
+.pro-only{display:none}
+body.plan-pro .pro-only{display:block}
+body.plan-pro .free-only{display:none}
+.rs{font-size:13.5px;color:var(--mute);text-align:center;padding:10px 6px;background:#0c1014;border:1px solid var(--line);border-radius:10px;min-height:44px;display:flex;align-items:center;justify-content:center}
 .block{display:flex; gap:11px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--line)}
 .block:last-child{border-bottom:0}
 .block .tm{font-size:11.5px; color:var(--mute); font-variant-numeric:tabular-nums; width:52px; flex:0 0 52px; padding-top:3px}
@@ -139,6 +148,12 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
     <div class="dot"></div>
     <h1>BLAZEPOD カートトレーニング</h1>
     <div class="sub">8歳・ジュニア / ポッド4個</div>
+  </div>
+  <div class="plansel">
+    <span class="lbl">プラン</span>
+    <button data-plan="free">無料</button>
+    <button data-plan="pro">Pro</button>
+    <span class="hint" id="planHint"></span>
   </div>
 </header>
 
@@ -186,12 +201,18 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   <h2>BLAZEPODアプリ 操作マニュアル</h2>
   <p class="lead">英語UIの読み方つき。<b>公式ユーザーマニュアル（2026年11月版）</b>に沿っています。</p>
 
-  <div class="ok">
-    <b>いちばん大事なこと</b><br>
-    無料プラン（<b>BlazePod Go</b>）でも、<b>RANDOM（ランダム）の光り方なら自分でドリルを作れます</b>。
-    このメニューの11種はすべてランダムなので、<b>最初に11個作ってコレクションにまとめてしまえば</b>、
-    あとは毎日それを開いて上から順にやるだけになります。
+  <div class="warn">
+    <b>訂正：ドリルの自作は Pro 登録が必要でした</b><br>
+    公式FAQには「無料でもRANDOMなら作れる」とありましたが、<b>実機では Pro が必要</b>でした。実機が正です。<br>
+    そこで、<b>自作なしで全部できる形</b>に組み直しました。やることは次の3つだけです。
   </div>
+  <div class="ok">
+    <b>① BLAZEPODは「ランダムに光るだけ」の既成ドリルを3つ選んで使う</b>（4個用・2個用・1個用）<br>
+    <b>② 時間と本数は、このアプリのタイマーで区切る</b><br>
+    <b>③ ドリルの違いは「置き方」と「口での約束」で作る</b>
+  </div>
+  <p class="small muted">BLAZEPODにやってもらうのは「ランダムに光る」ことと「反応時間を測る」ことだけ。
+  残りはこちらで作ります。<b>結果として、課金しなくても11種すべて成立します。</b></p>
 
   <!-- ===== 1. 画面の地図 ===== -->
   <h3>1. 画面の地図</h3>
@@ -235,22 +256,93 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   </div></details>
 
   <!-- ===== 3. ドリルを作る ===== -->
-  <h3>3. ⭐ 自分のドリルを11個作る（無料でできる）</h3>
+  <div class="free-only">
+  <h3>3. ⭐ 使うドリルを3つ決める（最初だけ）</h3>
+  <div class="card flat">
+    <p class="small">BLAZEPOD側で使うのは<b>3つだけ</b>です。これを★でお気に入りに入れれば、以後ずっと使い回せます。</p>
+    <ol>
+      <li>下の中央 <b>🔵 Training Hub</b> を開く</li>
+      <li>検索窓の横の<b>フィルターアイコン</b>をタップ</li>
+      <li><b>Pods＝4</b>、<b>Goal＝Reaction time</b>、<b>Accessories＝道具なし</b> で絞る</li>
+      <li>説明を読んで「<b>ランダムに光るのを叩くだけ</b>」のシンプルなものを1つ選ぶ<br>
+        <span class="small muted">※ 腕立て姿勢・ボール必須など、条件が多いものは避ける</span></li>
+      <li><b>★</b> を押してお気に入りに入れる ← <b>これが4個用の土台</b></li>
+      <li>同じ手順で <b>Pods＝2</b> と <b>Pods＝1</b> のものも1つずつ選んで★</li>
+    </ol>
+    <div class="note" style="margin-top:10px">
+      <b>選ぶときのコツ</b><br>
+      名前や説明に <b>Reaction</b> / <b>Random</b> / <b>Tap</b> が入っていて、<b>道具なし・1人・立ったまま</b>のものが当たりです。
+      迷ったら、実際に30秒やってみて「ただランダムに光るだけ」なら合格。
+    </div>
+  </div>
+  <div class="card flat">
+    <p class="small"><b>ドリル画面で調整できるものは調整します。</b>画面を下にスクロールすると、＋－ボタンのついた項目が出ることがあります。</p>
+    <dl class="kv">
+      <dt><b>Cycles</b></dt><dd>本数。出てきたら表のとおりに。<b>Time between cycles</b> のスライダーで休憩秒数も決まる</dd>
+      <dt><b>Stations</b></dt><dd><b>1</b> のままでOK</dd>
+      <dt>出てこない項目</dt><dd>そのドリルでは固定。<b>気にしなくて大丈夫です</b>。時間はこちらのタイマーで区切ります</dd>
+    </dl>
+  </div>
+
+  <h3>4. ドリル別・早見表 ⭐</h3>
+  <p class="small muted">「どの★ドリルを使うか」と「どれだけやるか」の表です。<b>時間はこのアプリの各ドリルカードにあるタイマーで区切ります</b>。</p>
+  <div class="card flat">
+    <table>
+      <tr><th>ドリル</th><th>使う★</th><th>長さ</th><th>本数</th></tr>
+      <tr><td>めざまし4タッチ</td><td class="n">4個用</td><td>60秒</td><td>1</td></tr>
+      <tr><td>左右うちわけタッチ</td><td class="n">2個用</td><td>20タッチ</td><td>2<span class="small muted">（間30秒）</span></td></tr>
+      <tr><td>センターもどりダッシュ</td><td class="n">4個用</td><td>30秒</td><td>3<span class="small muted">（間30秒）</span></td></tr>
+      <tr><td>スタートシグナル</td><td class="pb">使わない</td><td>10本</td><td>—</td></tr>
+      <tr><td>よこ見ワイド</td><td class="n">4個用</td><td>45秒</td><td>2<span class="small muted">（間30秒）</span></td></tr>
+      <tr><td>指カウント同時やり</td><td class="n">4個用</td><td>45秒</td><td>1</td></tr>
+      <tr><td>③はさわるな</td><td class="n">4個用</td><td>45秒</td><td>2<span class="small muted">（間30秒）</span></td></tr>
+      <tr><td>ルールチェンジ</td><td class="n">4個用</td><td>60秒</td><td>1</td></tr>
+      <tr><td>番号コール</td><td class="n">4個用</td><td>20タッチ</td><td>1</td></tr>
+      <tr><td>親子バトル</td><td class="n">4個用</td><td>30秒</td><td>交互に1本ずつ</td></tr>
+      <tr><td>自己ベストチャレンジ</td><td class="n">2個用</td><td>20タッチ</td><td>1</td></tr>
+      <tr><td>ピット・プライミング</td><td class="n">2個用</td><td>45秒</td><td>2<span class="small muted">（間15秒）</span></td></tr>
+    </table>
+  </div>
+  <div class="note">
+    <b>長さが合わなくても気にしないでください</b><br>
+    選んだ既成ドリルが60秒固定でも、45秒でこちらのタイマーが鳴ったら<b>そこで止めればOK</b>（右上の <b>×</b> か一時停止）。
+    大事なのは<b>毎回同じ長さでやること</b>であって、何秒かではありません。<br>
+    <span class="small muted">※ 記録を取る「左右うちわけタッチ」「自己ベストチャレンジ」だけは、<b>必ず最後までやり切って</b> Avg. Reaction を読んでください。</span>
+  </div>
+  <div class="ok">
+    <b>「スタートシグナル」だけはBLAZEPODを使いません</b><br>
+    ランダムな待ち時間はPro機能（Light Delay Time）なので、<b>このアプリの「ランダムスタート」ボタン</b>で代用します。
+    メニュータブの「スタートシグナル」を開くと🚦ボタンがあり、押すと<b>2〜8秒後にピッと鳴ります</b>。
+    鳴った瞬間にポッドを叩く、という使い方です。
+  </div>
+  </div><!-- /free-only -->
+
+  <!-- ===== 3P. Pro：自分で作る ===== -->
+  <div class="pro-only">
+  <h3>3P. ⭐ 自分でドリルを11個作る（最初だけ）</h3>
   <div class="card flat">
     <p class="small">ホーム画面の <b>My Activities</b> にある <b>＋</b> をタップ → <b>Create Screen</b> が開きます。</p>
     <ol>
-      <li><b>Choose Light Logic</b> の画面になる。横にスワイプして <b>RANDOM</b> を選ぶ<br>
-        <span class="small muted">（RANDOM＝「叩いて消したら、次にどれが光るかはランダム」。無料で使えるのはこれ）</span><br>
-        → <b>Choose</b> を押す</li>
-      <li><b>Defining General Setup</b> が出る。<b>Stations</b>＝<b>1</b>、<b>Pods</b>（Per station）＝下の表の数 → <b>Next</b></li>
-      <li>続けて <b>Activity Duration / Lights Out / Light Delay Time / Cycles</b> を表のとおりに設定</li>
-      <li>名前を付けて保存。日本語名でOK（例「めざまし4タッチ」）</li>
-      <li>保存したドリルを開き、<b>⋯</b> → <b>Add to a collection</b> で <b>「マイメニュー」</b> という<b>コレクション</b>にまとめる</li>
+      <li><b>Choose Light Logic</b> を横にスワイプして <b>RANDOM</b> を選び、<b>Choose</b></li>
+      <li><b>Defining General Setup</b>：<b>Stations＝1</b>、<b>Pods</b>（Per station）＝表の数 → <b>Next</b></li>
+      <li><b>Lights Out</b> を <b>Hit</b> にする（全ドリル共通。叩くまで光が消えない設定）</li>
+      <li><b>Activity Duration / Light Delay Time / Cycles</b> を下の表のとおりに</li>
+      <li>名前を付けて保存（日本語でOK。例「めざまし4タッチ」）</li>
+      <li>保存したドリルを開き <b>⋯</b> → <b>Add to a collection</b> → <b>「マイメニュー」</b>にまとめる</li>
     </ol>
-    <p class="small muted">11個作るのは最初だけ。30分くらいかかりますが、<b>これをやると毎日の操作が「コレクションを開いて上から順にタップ」だけ</b>になります。</p>
+    <p class="small muted">11個作るのは最初だけ。30分ほどかかりますが、以後は<b>コレクションを開いて上から順にタップするだけ</b>になります。</p>
   </div>
 
-  <h3>4. ドリル別・設定早見表 ⭐</h3>
+  <h3>4P. ドリル別・設定早見表 ⭐</h3>
+  <div class="ok" style="margin-bottom:10px">
+    <b>まず、全ドリル共通の3つ（表には出てきません）</b>
+    <div class="setg" style="margin:8px 0 4px">
+      <span>Light Logic <b>RANDOM</b></span>
+      <span>Stations <b>1</b></span>
+      <span>Lights Out <b>Hit</b></span>
+    </div>
+    <span class="small muted">※ <b>Competition Mode</b> が出てきたら <b>Regular mode</b> のままでOK。</span>
+  </div>
   <div class="card flat">
     <table>
       <tr><th>ドリル</th><th>Pods</th><th>Activity Duration</th><th>Light Delay</th><th>Cycles</th></tr>
@@ -266,22 +358,27 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
       <tr><td>親子バトル</td><td class="n">4</td><td>Timeout <b>30</b>s</td><td>None</td><td class="n">1</td></tr>
       <tr><td>ピット・プライミング</td><td class="n">2</td><td>Timeout <b>45</b>s</td><td>None</td><td class="n">2<br><span class="small muted">間15s</span></td></tr>
     </table>
-    <p class="small muted" style="margin-top:10px"><b>Lights Out</b> は全部 <b>Hit</b>（叩くまで消えない）。<b>Stations</b> は全部 <b>1</b>。<br>
-    「自己ベストチャレンジ」は「左右うちわけタッチ」の <b>Cycles を1</b> にしただけなので、<b>新しく作らなくてOK</b>です。</p>
+    <p class="small muted" style="margin-top:10px">「自己ベストチャレンジ」は「左右うちわけタッチ」の <b>Cycles を1</b> にしただけなので、<b>新しく作らなくてOK</b>です。</p>
   </div>
   <div class="note">
-    <b>Cycles を使うと本数を自動で数えてくれます</b><br>
-    「30秒×3本・間30秒」のようなものは、<b>Cycles＝3</b>・<b>Time between cycles＝30秒</b>にすれば、
-    アプリが休憩まで管理してくれます。父がストップウォッチを見る必要がなくなります。
+    <b>Cycles を使うとストップウォッチが不要になります</b><br>
+    「30秒×3本・間30秒」は <b>Cycles＝3</b>・<b>Time between cycles＝30秒</b> にすれば、休憩まで含めてアプリが管理してくれます。
   </div>
+  <div class="ok">
+    <b>Proで一番効くのは「スタートシグナル」</b><br>
+    <b>Light Delay Time → Random（2〜8秒）</b> が使えるようになり、
+    <b>レーススタートの反応時間が ms で測れる</b>ようになります。無料版ではここだけ測定できません。
+  </div>
+  </div><!-- /pro-only -->
 
   <!-- ===== 5. 毎日の流れ ===== -->
   <h3>5. 毎日の流れ（4ステップ）</h3>
   <div class="ok">
-    <b>①</b> アプリを開く → <b>右上の数字が 4</b> か確認<br>
-    <b>②</b> ホーム画面の <b>My Collections</b> から「マイメニュー」を開く<br>
-    <b>③</b> 今日のドリルをタップ → <b>Start Now</b><br>
-    <b>④</b> 終わったら結果の <b>Avg. Reaction</b> と <b>Hits</b> を見て、「記録」タブに入れる
+    <b>①</b> BLAZEPODアプリを開く → <b>右上の数字が 4</b> か確認<br>
+    <b>②</b> ホーム画面の <b>Favorites</b> から、今日使う★ドリル（4個用 / 2個用）を開く<br>
+    <b>③</b> ポッドを置く（こちらのアプリの配置図のとおり）→ <b>Start Now</b><br>
+    <b>④</b> 同時に<b>こちらのアプリのタイマー</b>をスタート。鳴ったら区切る<br>
+    <b>⑤</b> 記録する日は、結果の <b>Avg. Reaction</b> と <b>Hits</b> を「記録」タブに入れる
   </div>
   <p class="small muted">離れた位置から始めたいときは <b>Start on Hit</b>（ポッドを1回叩くと開始）。「センターもどりダッシュ」のように中心に戻ってから始めたい場合に便利です。</p>
 
@@ -320,7 +417,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 
   <details><summary>Light Logic — 光り方のルール（5種）</summary><div class="body">
     <dl class="kv">
-      <dt><b>RANDOM</b></dt><dd><span class="pb">無料で使えるのはこれ。</span>叩いて消すと、次に光るポッドがランダムに選ばれる。<b>このメニューは全部これでOK。</b></dd>
+      <dt><b>RANDOM</b></dt><dd>叩いて消すと、次に光るポッドがランダムに選ばれる。<b>このメニューが使うのはこれだけ</b>なので、既成ドリルもこのタイプを選びます。</dd>
       <dt><b>Home Base</b></dt><dd>「ホーム」のポッドを決める方式。<b>Home base Pod color</b> でその色を指定。</dd>
       <dt><b>Focus</b></dt><dd>気を散らすポッドを混ぜる方式。<b>Number of distracting Pods</b>（数）、<b>Distracting Pod colors</b>（色）、<b>Strike Out</b>（何回お手つきで終了か）。<br>
         <span class="small muted">「③はさわるな」のアプリ版。ただしPro機能の可能性が高いので、番号ルールで代用しています。</span></dd>
@@ -391,15 +488,38 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   <h3>11. 無料プラン（BlazePod Go）でできること</h3>
   <div class="card flat small">
     <table>
-      <tr><th></th><th>無料（Go）</th><th>Pro</th></tr>
-      <tr><td>既成ドリル</td><td>◎ 全部使える</td><td>◎</td></tr>
-      <tr><td>自作ドリル</td><td>○ <b>RANDOM のみ</b></td><td>◎ 全部の light logic</td></tr>
+      <tr><th></th><th>無料</th><th>Pro</th></tr>
+      <tr><td>既成ドリルを使う</td><td>◎ 全部使える</td><td>◎</td></tr>
+      <tr><td>★お気に入り・結果の記録</td><td>◎</td><td>◎</td></tr>
+      <tr><td><b>ドリルの自作</b></td><td class="pb">✕ <b>実機で確認済み</b></td><td>◎</td></tr>
+      <tr><td>Light Delay（ランダムな待ち）</td><td>✕</td><td>◎</td></tr>
+      <tr><td>色で選ぶ（Focus logic）</td><td>✕</td><td>◎</td></tr>
       <tr><td>Performance Tests</td><td>✕</td><td>◎</td></tr>
-      <tr><td>詳しい分析</td><td>△</td><td>◎</td></tr>
     </table>
-    <p class="muted" style="margin-top:10px">このメニューの11種は<b>すべて RANDOM</b> なので、無料のまま全部作れます。
-    まず3〜4週間続けて、物足りなくなったらProを検討すれば十分です。</p>
-    <p class="small muted">※ 無料の制限内容は公式FAQの記述によります。実機と違っていたら下のメモ欄へ。</p>
+    <p class="muted" style="margin-top:10px">できないことは、すべて<b>置き方・口での約束・このアプリのタイマーとランダムスタート</b>で代用しています。
+    無料のまま11種すべて成立するので、<b>まず3〜4週間続けてから</b>Proを検討すれば十分です。</p>
+  </div>
+
+  <h3>11-2. Proに入るか迷ったら</h3>
+  <div class="card flat small">
+    <p><b>Proで実際に変わるのは、この3つだけです。</b></p>
+    <dl class="kv">
+      <dt>① 毎日の操作</dt><dd>11種を保存してコレクションにまとめられる。父の操作が「探して設定」から<b>「選ぶだけ」</b>になる。<br>
+        <span class="muted">毎日やる前提だと、ここの差が一番大きい。</span></dd>
+      <dt>② 測れる数字が増える</dt><dd><b>スタートシグナルの反応時間</b>が ms で測れる（Light Delay Time → Random）。<br>
+        <span class="muted">カートのスタートに直結する数字なので、レース志向なら価値が高い。</span></dd>
+      <dt>③ 判断ドリルが自動化</dt><dd>「③はさわるな」を色（Focus logic）でできる。<b>お手つき数が自動でカウント</b>され、父が数えなくてよくなる。</dd>
+    </dl>
+    <div class="ok" style="margin-top:12px">
+      <b>おすすめの決め方</b><br>
+      まず<b>無料で2週間</b>続けてみてください。<b>続いたらPro、続かなかったら不要</b>——これが一番確実です。<br>
+      <span class="small muted">道具を買った直後は誰でも続きます。2週間後に本人が「やろう」と言うかどうかが本当の判断材料です。</span>
+    </div>
+    <div class="note" style="margin-top:10px">
+      <b>先にProへ入るなら</b><br>
+      上の<b>プラン切替を「Pro」</b>に変えてください。<b>3P・4P</b>の作成手順と設定表に切り替わり、
+      各ドリルの「BLAZEPOD側の条件」も Create 画面用の値になります。
+    </div>
   </div>
 
   <!-- ===== 12. メモ ===== -->
@@ -541,6 +661,7 @@ const DRILLS = [
   setup:["床にポッド4個を半円に置く（左右の端まで約1.2m）","本人は半円の中心に立つ","手を伸ばして全部に届くか先に確認"],
   how:["光ったポッドを手でタッチ、すぐ次を待つ","足はほぼ動かさない。手だけでテンポよく","60秒きっちりで終わり"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 60秒"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","60秒"],["本数","1本"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["「まずは体を起こすだけ。全力じゃなくていいよ」","数字は見ない。ここは記録しない"],
   metric:null
 },
@@ -557,6 +678,7 @@ const DRILLS = [
   setup:["ポッド2個を60cmあけて正面の床に置く","①の上に左手、②の上に右手を軽く添える（浮かせる）"],
   how:["光った側の手だけでタッチ","反対の手でとるのは無効。父が見ていて指摘する","20タッチで1本。30秒休んでもう1本"],
   app:[["Light Logic","RANDOM"],["Pods","2"],["Activity Duration","Hit 20"],["Cycles","2（間30秒）"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","2個"],["長さの目安","20タッチ"],["本数","2本（間30秒）"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["「手は浮かせて、いつでも落とせる形で待つ」","「速くしようとして体が固まったら逆に遅くなる。息を吐いて待つ」"],
   metric:{key:"avg", label:"Avg. Reaction（ms）", better:"low", hint:"例 420（小さいほど良い）"}
 },
@@ -572,6 +694,7 @@ const DRILLS = [
   setup:["ポッド4個を1辺1.5mくらいの四角に置く","中心に立つ。中心にテープで×を貼ると戻る位置が決まる"],
   how:["光ったポッドまで動いて手でタッチ","タッチしたら必ず中心に戻る","30秒 → 30秒休み、を3本"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 30秒"],["Cycles","3（間30秒）"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","30秒"],["本数","3本（間30秒）"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["「中心に戻るのをサボらない。戻るのが練習」","本数が落ちてきたら即やめる。疲労で遅い動きを覚えると損"],
   metric:{key:"hits", label:"30秒のタッチ数（1本目）", better:"high", hint:"例 18"}
 },
@@ -584,11 +707,14 @@ const DRILLS = [
     lines:[[160,76,160,114]],
     labels:[{t:"イスに座り、ハンドルを握る形で",x:160,y:160},{t:"目の高さ・正面",x:160,y:38}],
     cap:"ポッド1個を正面の目の高さに。壁に貼る or 父が持つ。"},
-  setup:["イスに座り、ハンドルを握る姿勢をつくる（背中はシートに、腕は軽く曲げる）","ポッド1個を正面・目の高さに置く（壁に貼るか、父が持つ）","光ったら片手を膝からパッと上げてタッチ、を合図とする"],
-  how:["「レディ」で構える。あとは黙って待つ","光った瞬間にタッチ。10本","毎回 待ち時間を変える（2秒〜8秒）。これが一番大事"],
+  setup:["イスに座り、ハンドルを握る姿勢をつくる（背中はシートに、腕は軽く曲げる）","ポッド1個を正面・目の高さに置く（壁に貼るか、父が持つ）","父はこのアプリの<b>「ランダムスタート」</b>ボタンを押す係"],
+  how:["「レディ」で構える。あとは黙って待つ","<b>ピッと鳴った瞬間</b>にポッドをタッチ。10本","待ち時間は2〜8秒でバラバラになる。これが一番大事"],
   app:[["Light Logic","RANDOM"],["Pods","1"],["Activity Duration","Hit 10"],["Light Delay Time","Random 最小2秒／最大8秒"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
-  coach:["待ち時間が一定だとタイミングを予測して速く見えるだけ。<b>必ずバラバラに</b>","「フライングはゼロ点」。光る前に動いたらその本はやり直し","「待つのも練習。息を止めない」"],
-  metric:{key:"avg", label:"Avg. Reaction（ms）", better:"low", hint:"例 380"}
+  appFree:[["使うポッド","1個"],["長さの目安","ランダムスタートで合図"],["本数","10本"],["ドリルの種類","ランダムに光るだけのもの"]],
+  randomStart:{min:2,max:8},
+  freeNote:"このドリルだけは<b>待ち時間のランダム設定が要る</b>ので、既成ドリルでは再現しにくいです。下の<b>「ランダムスタート」ボタン</b>を合図に使ってください（反応時間は測れませんが、練習の質は同じです）。",
+  coach:["待ち時間が一定だとタイミングを予測して速く見えるだけ。<b>必ずバラバラに</b>","「フライングはゼロ点」。鳴る前に動いたらその本はやり直し","「待つのも練習。息を止めない」"],
+  metric:null
 },
 /* ---------- 周辺視野 ---------- */
 {
@@ -604,6 +730,7 @@ const DRILLS = [
   setup:["正面の壁か床に、テープで<b>×</b>の目印を貼る（目の高さ）","ポッド4個を左右いっぱいに広げて床に置く（端から端まで3m目安）","本人は中心に立ち、目は×に固定"],
   how:["<b>顔と目は×から動かさない</b>。横のポッドは視野の端で気づいてタッチ","届かないときは足を1歩だけ。顔は×のまま","45秒 → 休憩 → もう1本"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 45秒"],["Cycles","2（間30秒）"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","45秒"],["本数","2本（間30秒）"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["父は<b>本人の目を見る</b>。顔が動いたら「×見て！」と一声","「見えなくても“なんか光った気がする”で手を出していい。それが周辺視野」","最初は取りこぼして当たり前。数より“顔が動かないこと”を褒める"],
   metric:{key:"hits", label:"45秒のタッチ数", better:"high", hint:"例 22"}
 },
@@ -620,6 +747,7 @@ const DRILLS = [
   setup:["「よこ見ワイド」と同じ配置","父は正面（×の位置）に立つ"],
   how:["父はときどき指を1〜5本出す","本人は<b>光をタッチしながら、指の数を声に出す</b>","45秒。両方できたら成功、どちらかが止まったらそこが限界"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 45秒"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","45秒"],["本数","1本"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["できないのが普通。<b>できない状態でやること</b>に意味がある","声が出なくなったら「声だけでいいよ」と言って手を休ませる"],
   metric:null
 },
@@ -635,6 +763,7 @@ const DRILLS = [
   setup:["「めざまし4タッチ」と同じ半円の配置","ポッドの①②③④のシールを見えるように置く","約束を<b>声に出して</b>確認：「①②④はタッチ、<b>③はさわらない</b>」"],
   how:["光ったらタッチ。ただし<b>③が光ったら手を出さずに我慢</b>","③を押したら父が「ミス1」と数える","45秒 × 2本。ミスの数を記録する"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 45秒"],["Cycles","2（間30秒）"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","45秒"],["本数","2本（間30秒）"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["<b>速さよりミスの少なさ</b>を褒める。「我慢できたね」が正解","ミス0が2回続いたら<b>禁止を2個</b>にする（②と③はさわらない）","さらに慣れたら禁止ポッドを毎本変える（今日は①、次は④）"],
   metric:{key:"miss", label:"ミスの数（2本合計）", better:"low", hint:"例 3"},
   extra:{t:"色を使えるドリルが見つかったら", b:"コミュニティドリルの中に色を指定できるものがあれば、<b>「青はタッチ・赤は我慢」</b>に置き換えてもOK（中身は同じ）。ただし番号ルールのほうが本人に説明しやすく、効果もほぼ同じなので、無理に探す必要はありません。"}
@@ -651,6 +780,7 @@ const DRILLS = [
   setup:["「③はさわるな」と同じ配置・同じ設定で始める"],
   how:["最初は<b>③が禁止</b>","父が好きなタイミングで「<b>チェンジ！</b>」と言う → 禁止が<b>①</b>に入れ替わる（③はタッチしてよくなる）","60秒で2〜3回チェンジする。①↔③を行き来させる"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 60秒"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","60秒"],["本数","1本"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["チェンジ直後は必ずミスる。<b>それが普通</b>と先に伝えておく","「切り替えが速かったね」と、戻りの速さを褒める","混乱しすぎたらチェンジは1回だけに減らす"],
   metric:null
 },
@@ -666,6 +796,7 @@ const DRILLS = [
   setup:["ポッドに①②③④のシールを貼る","半円に置く（「めざまし4タッチ」と同じ）"],
   how:["父が番号を1つ言う（例「さん！」）","<b>その番号が光っていたらタッチ。光っていなければ何もしない</b>","20本"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Hit 20"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","20タッチ"],["本数","1本"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["ゆっくりでいい。ここは速さの練習ではない","慣れたら父のコールを早口にする"],
   metric:null
 },
@@ -682,6 +813,7 @@ const DRILLS = [
   setup:["左右に2個ずつ分けて置く","本人と父がそれぞれ自分の2個の前に立つ"],
   how:["30秒でタッチ数の多いほうが勝ち","父は<b>たまに負ける</b>。全勝すると続かない","2本やって終わり"],
   app:[["Light Logic","RANDOM"],["Pods","4"],["Activity Duration","Timeout 30秒"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","4個"],["長さの目安","30秒"],["本数","1本ずつ交互"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["無料プランは1アカウントなので、<b>交互に30秒ずつ</b>測って数を比べるのが確実","ここは記録しない。笑って終わるのが目的"],
   metric:null
 },
@@ -696,6 +828,7 @@ const DRILLS = [
   setup:["「左右うちわけタッチ」とまったく同じ配置にする","毎回同じ曜日・同じ時間にやると比べられる"],
   how:["20タッチ1本だけ。全力","結果画面の <b>Avg. Reaction</b>（ms）を「記録」タブに入れる"],
   app:[["Light Logic","RANDOM"],["Pods","2"],["Activity Duration","Hit 20"],["Cycles","1"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","2個"],["長さの目安","20タッチ"],["本数","1本"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["更新できなくても気にしない。体調で0.05秒は動く","4週間の平均で見る。1回の数字では判断しない"],
   metric:{key:"avg", label:"Avg. Reaction（ms）", better:"low", hint:"例 400"}
 },
@@ -711,6 +844,7 @@ const DRILLS = [
   setup:["ポッド2個を目の高さに、80cm〜1mあけて固定（壁・テント支柱・父が持つ）","立ったまま、腕は軽く曲げて構える"],
   how:["<b>45秒</b>：光ったほうを手でタッチ（全力）","<b>15秒</b>：休む","<b>45秒</b>：もう1本。終わり","走行の10〜15分前に実施。これ以上はやらない"],
   app:[["Light Logic","RANDOM"],["Pods","2"],["Activity Duration","Timeout 45秒"],["Cycles","2（間15秒）"],["Lights Out","Hit"],["Stations","1"]],
+  appFree:[["使うポッド","2個"],["長さの目安","45秒"],["本数","2本（間15秒）"],["ドリルの種類","ランダムに光るだけのもの"]],
   coach:["目的は<b>目覚まし</b>。疲れさせたら逆効果","数字は見ない。レース前に悪い数字を見せない","緊張が強い日は本数を減らして、声かけを多めに"],
   metric:null
 }
@@ -748,11 +882,21 @@ function drillCard(d, open){
     ${diagram(d.diag)}
     <details ${open?"open":""}><summary>置き方</summary><div class="body"><ul>${d.setup.map(x=>`<li>${x}</li>`).join("")}</ul></div></details>
     <details ${open?"open":""}><summary>やり方</summary><div class="body"><ol>${d.how.map(x=>`<li>${x}</li>`).join("")}</ol></div></details>
-    <details><summary>アプリの設定値</summary><div class="body">${setg(d.app)}
-      <p class="small muted">作り方は「アプリ」タブの<b>「3. 自分のドリルを11個作る」</b>を見てください。一度作れば次からは選ぶだけです。</p>
+    <details><summary>BLAZEPOD側の条件</summary><div class="body">
+      <div class="free-only">${setg(d.appFree)}
+        <p class="small muted">無料プランは自作ができないので、これは<b>既成ドリルを選ぶときの基準</b>です。探し方は「アプリ」タブの<b>「3. 使うドリルを3つ決める」</b>へ。長さが違っても気にせず、下のタイマーで区切ってください。</p>
+        ${d.freeNote?`<div class="note" style="margin-top:8px">${d.freeNote}</div>`:""}
+      </div>
+      <div class="pro-only">${setg(d.app)}
+        <p class="small muted">Proの <b>Create</b> 画面でこのとおりに作り、<b>Add to a collection</b> で「マイメニュー」にまとめてください。作り方は「アプリ」タブの<b>「3P. 自分でドリルを作る」</b>へ。</p>
+      </div>
       ${d.extra?`<div class="note" style="margin-top:8px"><b>${d.extra.t}</b><br>${d.extra.b}</div>`:""}
     </div></details>
     <details><summary>父の声かけ・注意点</summary><div class="body"><ul>${d.coach.map(x=>`<li>${x}</li>`).join("")}</ul></div></details>`;
+  if(d.randomStart) h += `<div class="timer" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div class="rs" id="rs-${d.id}">ボタンを押すと<b>${d.randomStart.min}〜${d.randomStart.max}秒後</b>にピッと鳴ります</div>
+      <button class="primary" data-rstart="${d.id}" data-min="${d.randomStart.min}" data-max="${d.randomStart.max}">🚦 ランダムスタート</button>
+    </div>`;
   const secs = parseTime(d.time);
   if(secs) h += `<div class="timer">
       <button class="sm" data-timer="${d.id}" data-sec="${secs}">▶ ${secs}秒</button>
@@ -859,6 +1003,28 @@ function bindTimers(){
       },1000);
     };
   });
+  document.querySelectorAll("[data-rstart]").forEach(b=>{
+    b.onclick = ()=>{
+      const id=b.dataset.rstart, min=+b.dataset.min, max=+b.dataset.max;
+      const el=document.getElementById("rs-"+id);
+      if(b.dataset.busy==="1") return;
+      b.dataset.busy="1"; b.textContent="…レディ…";
+      el.innerHTML = `<span style="color:var(--yellow);font-weight:700">レディ…　動かないで待つ</span>`;
+      beep(520,.08);
+      const wait = (min + Math.random()*(max-min))*1000;
+      setTimeout(()=>{
+        el.innerHTML = `<span style="color:var(--green);font-size:26px;font-weight:700">GO!</span>`;
+        beep(1320,.3);
+        if(navigator.vibrate) navigator.vibrate([200]);
+        b.textContent="🚦 もう1本";
+        b.dataset.busy="";
+        setTimeout(()=>{
+          if(b.dataset.busy!=="1")
+            el.innerHTML = `ボタンを押すと<b>${min}〜${max}秒後</b>にピッと鳴ります`;
+        }, 2500);
+      }, wait);
+    };
+  });
   document.querySelectorAll("[data-reset]").forEach(b=>{
     b.onclick=()=>{
       const id=b.dataset.reset;
@@ -959,7 +1125,26 @@ function showTab(name){
 }
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
+/* =========================================================
+   プラン切替（無料 / Pro）
+   ========================================================= */
+const PLAN_HINT = {
+  free: "自作不可。既成ドリル＋置き方＋タイマーで回す",
+  pro:  "自作可。11個作ってコレクションにまとめる"
+};
+function setPlan(p){
+  document.body.classList.toggle("plan-pro", p==="pro");
+  document.body.classList.toggle("plan-free", p!=="pro");
+  document.querySelectorAll(".plansel button").forEach(b=>
+    b.setAttribute("aria-pressed", b.dataset.plan===p));
+  document.getElementById("planHint").textContent = PLAN_HINT[p] || PLAN_HINT.free;
+  LS.set("bp_plan", p);
+}
+document.querySelectorAll(".plansel button").forEach(b=>
+  b.onclick=()=>setPlan(b.dataset.plan));
+
 /* init */
+setPlan(LS.get("bp_plan","free"));
 renderToday();
 setCat("all");
 renderLog();

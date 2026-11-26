@@ -1,6 +1,6 @@
 // BLAZEPOD カートトレーニング — オフライン用
 // 方針: stale-while-revalidate（まずキャッシュを返し、裏で最新を取り直す）
-const CACHE = "bp-kart-v1";
+const CACHE = "bp-kart-fd8a7eba";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
